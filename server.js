@@ -6,7 +6,7 @@ const app = express();
 // 👉 Thay bằng App ID và Secret của bạn trên Zalo Developers
 const APP_ID = "190841530267471833";
 const APP_SECRET = "K01iCwiDSG6lRn33FIQT";
-const REDIRECT_URI = "http://localhost:3000/auth/callback";
+const REDIRECT_URI = "https://zalo-login.onrender.com/auth/callback";
 
 // Home page có nút login
 app.get("/", (req, res) => {
@@ -67,7 +67,7 @@ app.get("/auth/callback", async (req, res) => {
     );
 
     const accessToken = tokenRes.data.access_token;
-
+    sdasdawdasdasdsa
     // Lấy thông tin user
     const userRes = await axios.get("https://graph.zalo.me/v2.0/me", {
       params: {
