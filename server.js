@@ -97,15 +97,17 @@ app.get("/auth/callback", async (req, res) => {
     // Đổi code -> access_token
     const tokenRes = await axios.post(
       "https://oauth.zaloapp.com/v4/access_token",
-      null,
+      new URLSearchParams({
+        app_id: APP_ID,
+        grant_type: "authorization_code",
+        code,
+        code_verifier: codeVerifier,
+        redirect_uri: REDIRECT_URI,
+      }).toString(),
       {
-        params: {
-          app_id: APP_ID,
-          app_secret: APP_SECRET,
-          code,
-          redirect_uri: REDIRECT_URI,
-          code_verifier: codeVerifier,
-          grant_type: "authorization_code",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          secret_key: APP_SECRET,
         },
       }
     );
