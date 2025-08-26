@@ -91,6 +91,11 @@ app.get("/auth/callback", async (req, res) => {
   const codeVerifier = pkceStore[state];
   delete pkceStore[state]; // tránh reuse
 
+
+  console.log("state callback:", state);
+  console.log("pkceStore:", pkceStore);
+  console.log("codeVerifier:", codeVerifier);
+
   try {
     // Đổi code -> access_token
     const tokenRes = await axios.post(
