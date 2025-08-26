@@ -36,7 +36,9 @@ function generateCodeChallenge(verifier) {
 app.get("/", (req, res) => {
   res.send(`
     <html>
-      <head><title>Login Zalo Demo</title></head>
+      <head>
+      <title>Login Zalo Demo</title></head>
+      <meta name="zalo-platform-site-verification" content="RV26S8lY87j0rODJnSGjNpBpzqRUXIGQCpSt" />
       <body style="font-family:sans-serif;text-align:center;margin-top:100px;">
         <h1>Trang Home</h1>
         <a href="/login"
