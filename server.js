@@ -7,10 +7,8 @@ const app = express();
 // ⚡ Thay bằng APP_ID và APP_SECRET thật của bạn trong Zalo Developers
 const APP_ID = "2154611541573635802";
 const APP_SECRET = "K01iCwiDSG6lRn33FIQT";
-const REDIRECT_URI = "https://zalo-login.onrender.com/auth/callback"; // hoặc https://xxx.ngrok-free.app/auth/callback khi test local
-
-// Bộ nhớ tạm cho PKCE
-const pkceStore = {};
+const REDIRECT_URI = "https://zalo-login.onrender.com/auth/callback";
+// hoặc "https://xxx.ngrok-free.app/auth/callback" khi test local
 
 // ===== Helpers =====
 
@@ -37,10 +35,7 @@ function generateCodeChallenge(verifier) {
 
 // Tạo appsecret_proof (dùng khi call API user info)
 function generateAppSecretProof(accessToken, appSecret) {
-  return crypto
-    .createHmac("sha256", appSecret)
-    .update(accessToken)
-    .digest("hex");
+  return crypto.createHmac("sha256", appSecret).update(accessToken).digest("hex");
 }
 
 // ===== Routes =====
@@ -51,7 +46,6 @@ app.get("/", (req, res) => {
     <html>
       <head>
        <meta name="zalo-platform-site-verification" content="RV26S8lY87j0rODJnSGjNpBpzqRUXIGQCpSt" />
-
         <title>Login Zalo Demo</title>
       </head>
       <body style="font-family:sans-serif;text-align:center;margin-top:100px;">
@@ -67,12 +61,15 @@ app.get("/", (req, res) => {
 
 // Step 1: Redirect sang Zalo
 app.get("/login", (req, res) => {
-  const state = crypto.randomBytes(8).toString("hex"); // random state
   const codeVerifier = generateCodeVerifier();
   const codeChallenge = generateCodeChallenge(codeVerifier);
 
-  // Lưu code_verifier theo state
-  pkceStore[state] = codeVerifier;
+  // Đóng gói state (gồm code_verifier + nonce chống CSRF)
+  const stateObj = {
+    verifier: codeVerifier,
+    nonce: crypto.randomBytes(8).toString("hex"),
+  };
+  const state = Buffer.from(JSON.stringify(stateObj)).toString("base64url");
 
   const zaloLoginUrl = `https://oauth.zaloapp.com/v4/permission?app_id=${APP_ID}&redirect_uri=${encodeURIComponent(
     REDIRECT_URI
@@ -85,16 +82,16 @@ app.get("/login", (req, res) => {
 app.get("/auth/callback", async (req, res) => {
   const { code, state } = req.query;
   if (!code) return res.send("❌ Không có code từ Zalo!");
-  if (!state || !pkceStore[state])
-    return res.send("❌ Không tìm thấy code_verifier cho state này!");
+  if (!state) return res.send("❌ Không có state!");
 
-  const codeVerifier = pkceStore[state];
-  delete pkceStore[state]; // tránh reuse
-
-
-  console.log("state callback:", state);
-  console.log("pkceStore:", pkceStore);
-  console.log("codeVerifier:", codeVerifier);
+  // Giải mã state để lấy code_verifier
+  let codeVerifier;
+  try {
+    const stateObj = JSON.parse(Buffer.from(state, "base64url").toString());
+    codeVerifier = stateObj.verifier;
+  } catch (e) {
+    return res.send("❌ State không hợp lệ!");
+  }
 
   try {
     // Đổi code -> access_token
@@ -113,6 +110,9 @@ app.get("/auth/callback", async (req, res) => {
     );
 
     const accessToken = tokenRes.data.access_token;
+    if (!accessToken) {
+      return res.send("❌ Không lấy được access_token: " + JSON.stringify(tokenRes.data));
+    }
 
     // Tạo appsecret_proof
     const appSecretProof = generateAppSecretProof(accessToken, APP_SECRET);
@@ -138,6 +138,7 @@ app.get("/auth/callback", async (req, res) => {
       <a href="/">⬅️ Quay lại Home</a>
     `);
   } catch (err) {
+    console.error(err.response?.data || err.message);
     res.status(500).json({ error: err.response?.data || err.message });
   }
 });
