@@ -105,6 +105,7 @@ app.get("/auth/callback", async (req, res) => {
           code,
           redirect_uri: REDIRECT_URI,
           code_verifier: codeVerifier,
+          grant_type: "authorization_code",
         },
       }
     );
