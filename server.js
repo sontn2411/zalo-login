@@ -6,7 +6,7 @@ const app = express();
 
 const APP_ID = "190841530267471833";
 const APP_SECRET = "K01iCwiDSG6lRn33FIQT"; // vẫn cần cho server-side
-const REDIRECT_URI = "http://localhost:3000/auth/callback";
+const REDIRECT_URI = "https://zalo-login.onrender.com/auth/callback";
 
 // tạm lưu code_verifier theo state
 const pkceStore = {};
