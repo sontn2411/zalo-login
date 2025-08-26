@@ -102,7 +102,7 @@ app.get("/auth/callback", async (req, res) => {
         fields: "id,name,picture",
       },
     });
-
+    console.log('=========', userRes)
     res.send(`
       <h2>Thông tin user</h2>
       <p><b>ID:</b> ${userRes.data.id}</p>
