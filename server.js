@@ -66,6 +66,7 @@ app.get("/login", (req, res) => {
 
 // Step 2: callback từ Zalo
 app.get("/auth/callback", async (req, res) => {
+  console.log("ssssssssssss")
   const { code, state } = req.query;
   if (!code) return res.send("Không có code từ Zalo!");
   if (!state || !pkceStore[state])
