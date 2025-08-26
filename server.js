@@ -92,7 +92,7 @@ app.get("/auth/callback", async (req, res) => {
         },
       }
     );
-
+    console.log('=========tokenres==', tokenRes)
     const accessToken = tokenRes.data.access_token;
 
     // Lấy thông tin user
@@ -102,7 +102,7 @@ app.get("/auth/callback", async (req, res) => {
         fields: "id,name,picture",
       },
     });
-    console.log('=========', userRes)
+    console.log('====userRes=====', userRes)
     res.send(`
       <h2>Thông tin user</h2>
       <p><b>ID:</b> ${userRes.data.id}</p>
