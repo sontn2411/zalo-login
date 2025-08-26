@@ -68,7 +68,6 @@ app.get("/login", (req, res) => {
 
 // Step 2: callback từ Zalo
 app.get("/auth/callback", async (req, res) => {
-  console.log("ssssssssssss")
   const { code, state } = req.query;
   if (!code) return res.send("Không có code từ Zalo!");
   if (!state || !pkceStore[state])
@@ -77,6 +76,8 @@ app.get("/auth/callback", async (req, res) => {
   const codeVerifier = pkceStore[state];
   delete pkceStore[state]; // xoá đi để tránh reuse
 
+  console.log("ssssssssssss==========", codeVerifier)
+  console.log("pkceStore==========", pkceStore)
   try {
     // Đổi code lấy access_token (có kèm code_verifier)
     const tokenRes = await axios.post(
@@ -102,7 +103,7 @@ app.get("/auth/callback", async (req, res) => {
         fields: "id,name,picture",
       },
     });
-    console.log('====userRes=====', userRes)
+    // console.log('====userRes=====', userRes)
     res.send(`
       <h2>Thông tin user</h2>
       <p><b>ID:</b> ${userRes.data.id}</p>
