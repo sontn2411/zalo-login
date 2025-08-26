@@ -4,7 +4,7 @@ import crypto from "crypto";
 
 const app = express();
 
-const APP_ID = "190841530267471833";
+const APP_ID = "2154611541573635802";
 const APP_SECRET = "K01iCwiDSG6lRn33FIQT"; // vẫn cần cho server-side
 const REDIRECT_URI = "https://zalo-login.onrender.com/auth/callback";
 
